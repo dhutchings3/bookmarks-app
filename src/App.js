@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AddBookmark from './AddBookmark/AddBookmark';
 import BookmarkList from './BookmarkList/BookmarkList';
+import BookmarksContext from './BookmarksContext'
 import Nav from './Nav/Nav';
 import config from './config';
 import './App.css';
@@ -32,7 +33,7 @@ const bookmarks = [
 class App extends Component {
   state = {
     page: 'list',
-    bookmarks,
+    bookmarks: [],
     error: null,
   };
 
@@ -73,24 +74,28 @@ class App extends Component {
   }
 
   render() {
-    const { page, bookmarks } = this.state
+    const contextValue = {
+      bookmarks: this.state.bookmarks,
+      addBookmark: this.addBookmark,
+    }
     return (
       <main className='App'>
         <h1>Bookmarks!</h1>
-        <Nav clickPage={this.changePage} />
+        <BookmarksContext.Provider value={contextValue}>
+        <Nav />
         <div className='content' aria-live='polite'>
-          {page === 'add' && (
-            <AddBookmark
-              onAddBookmark={this.addBookmark}
-              onClickCancel={() => this.changePage('list')}
+          <Route
+            path='/add-bookmark'
+            componenet={AddBookmark}
             />
-          )}
-          {page === 'list' && (
-            <BookmarkList
-              bookmarks={bookmarks}
-            />
+          <Route 
+            exact
+            path='/'
+            componenet={BookmarkList}
+          />
           )}
         </div>
+        </BookmarksContext.Provider>
       </main>
     );
   }
